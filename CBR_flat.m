@@ -13,8 +13,6 @@ classdef CBR_flat
             for i = 1:length(this.Cases)
                 similarity(i) = similarFunc(this.Cases(i), newcase);
             end
-
-            disp(similarity);
             
             [~,idx] = sort(similarity);
 
