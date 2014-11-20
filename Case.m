@@ -12,7 +12,7 @@ classdef Case
             
             for i=1:length(AUs)
                 if AUs(i) > 0
-                    this.AUs = [AUs, i];
+                    this.AUs = [this.AUs, i];
                 end
             end
             
