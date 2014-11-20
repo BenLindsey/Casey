@@ -1,5 +1,5 @@
 function [ solvedcase ] = reuse( similarcase, newcase )
-%UNTITLED Summary of this function goes here
+%REUSE Summary of this function goes here
 %   Detailed explanation goes here
 
 
