@@ -1,4 +1,4 @@
 function [ similarcase ] = retrieve( cbr, newcase )
-    similarcase = cbr.retrieve(newcase);
+    similarcase = cbr.retrieveCase(newcase, @similar);
 end
 

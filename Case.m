@@ -1,17 +1,22 @@
 classdef Case
     properties
-        typicality
-        emotion
+        Typicality
+        Emotion
         AUs
     end
     
     methods
-        function this = Case(input, output)
-
-            this.typicality=0;
-            this.AUs=input;
-            this.emotion=output;
+        function this = Case(AUs, emotion)
+            this.Typicality = 0;
+            this.AUs = [];
             
+            for i=1:length(AUs)
+                if AUs(i) > 0
+                    this.AUs = [AUs, i];
+                end
+            end
+            
+            this.Emotion    = emotion; 
         end
     end
      
