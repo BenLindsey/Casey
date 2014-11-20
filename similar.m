@@ -1,7 +1,4 @@
-function [ output_args ] = similar( input_args )
-%SIMILAR Summary of this function goes here
-%   Detailed explanation goes here
-
-
+function [ similarity ] = similar( caseA, caseB )
+    similarity = (45 - length(setxor(caseA, caseB)))/45;
 end
 
