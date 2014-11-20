@@ -1,4 +1,5 @@
 classdef Case
+
     %UNTITLED2 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -25,10 +26,9 @@ classdef Case
 %             this.AUs=input;
 %             
 %          end
+    end
      
 
-         
-    end
-    
+
 end
 
