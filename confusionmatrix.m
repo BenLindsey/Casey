@@ -14,11 +14,10 @@ classdef confusionmatrix < handle
         function update(this, cbr, inputs, outputs)
             % Test the forest on each entry in the training data, then
             % increment the corresponding element in the matrix.
+            actuals = testCBR(cbr, inputs);
             for i=1:size(inputs, 1)
-                expectedEmotion = outputs(i);
-                actualEmotion = 1; % BEN, MAKE THIS WORK!
-                this.Matrix(expectedEmotion, actualEmotion) = ...
-                        this.Matrix(expectedEmotion, actualEmotion) + 1;
+                this.Matrix(outputs(i), actuals(i)) = ...
+                        this.Matrix(outputs(i), actuals(i)) + 1;
             end
         end
         
