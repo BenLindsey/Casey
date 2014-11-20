@@ -1,7 +1,4 @@
-function [ solvedcase ] = reuse( similarcase, newcase )
-%REUSE Summary of this function goes here
-%   Detailed explanation goes here
-
-
+function [ newcase ] = reuse( similarcase, newcase )
+    newcase.Emotion = similarcase.Emotion;
 end
 
