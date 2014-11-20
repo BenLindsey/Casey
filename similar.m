@@ -1,4 +1,4 @@
 function [ similarity ] = similar( caseA, caseB )
-    similarity = 0;
+    similarity = (45 - length(setxor(caseA, caseB)))/45;
 end
 

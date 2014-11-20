@@ -1,18 +1,21 @@
 classdef Case
-    %CASE Summary of this class goes here
-    %   Detailed explanation goes here
-    
     properties
-        Input
-        Output
+        typicality
+        emotion
+        AUs
     end
     
     methods
         function this = Case(input, output)
-            this.Input = input;
-            this.Output = output;
+
+            this.typicality=0;
+            this.AUs=input;
+            this.emotion=output;
+            
         end
     end
-    
+     
+
+
 end
 
