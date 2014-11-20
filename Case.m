@@ -16,7 +16,7 @@ classdef Case
                 end
             end
             
-            this.Emotion    = emotion; 
+            this.Emotion = emotion; 
         end
     end
      
