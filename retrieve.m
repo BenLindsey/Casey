@@ -1,7 +1,12 @@
 function [ similarcase ] = retrieve( cbr, newcase )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+    similarity = zeros(1, length(cbr));
+    
+    for i = 1:length(cbr)
+        similarity(i) = cbr(i, :);
+    end
 
+    [~,idx] = sort(similarity);
 
+    similarcase = cbr(idx(end));
 end
 
