@@ -7,7 +7,7 @@ classdef CBR_flat
         function this = CBR_flat()
         end
         
-        function similarcase = retrieve(this, newcase, similarFunc)
+        function similarcase = retrieveCase(this, newcase, similarFunc)
             similarity = zeros(1, length(this.Cases));
     
             for i = 1:length(this.Cases)
@@ -21,7 +21,7 @@ classdef CBR_flat
             similarcase = this.Cases(idx(end));
         end
         
-        function this = retain(this, newcase)
+        function this = retainCase(this, newcase)
             this.Cases = [this.Cases, newcase];
         end
     end

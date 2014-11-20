@@ -1,4 +1,4 @@
 function [ result ] = retain( cbr, solvedcase  )
-    result = cbr.retain(solvedcase);
+    result = cbr.retainCase(solvedcase);
 end
 
