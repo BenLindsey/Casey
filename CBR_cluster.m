@@ -54,17 +54,40 @@ classdef CBR_cluster
                 
             end  
             
+            %normalises weigths
+            
+            weights(:,:,:) = weights(:,:,:)/length(y);
+            
             %% creates indexes of importance of cases
             
-%             for clus = 1:length(cases)   %for each cluster
-%                 
-%                 for il = 2: length(cases{clus}) 
-%                     
-%                     
-%                     
-%                 end                
-%             
-%             end
+            for clus = 1:length(cases)   %for each cluster
+                
+                for ol = 2: length(cases{clus}) 
+                    
+                    for il=1:(ol-1)
+                        
+                        attribLogical = zeros(1,size(x,2));
+                        attribLogical( cases{clus}(ol).AUs ) = 1;
+                        importanceOL = ( weights(clus,:,1) .* attribLogical ) + ( weights(clus,:,2) .* ~attribLogical );
+                        
+                        
+                        attribLogical = zeros(1,size(x,2));
+                        attribLogical( cases{clus}(il).AUs ) = 1;
+                        importanceIL = ( weights(clus,:,1) .* attribLogical ) + ( weights(clus,:,2) .* ~attribLogical );
+                        
+                        if importanceOL>importanceIL
+                            
+                            caseOL = cases{clus}(ol);
+                            cases{clus}(ol)=[];
+                            cases{clus}(il)=[cases{clus}(ol), cases{clus}(il)];
+                            
+                        end
+                        
+                    end
+                    
+                end                
+            
+            end
             
             %% updates calss properties
             
@@ -73,26 +96,9 @@ classdef CBR_cluster
              
        end
                
-      %%          
-                
-            %other loop
-            
-                % indexing ??
-                
-            % normalize weights
             
                
 
-        
-        
-        function [cbr] = CBRinit_clus(x, y)
-      
-     %%          
-
-            
-            
-         end        
-        
         
 %         function similarcase = retrieve(this, newcase, similarFunc)
 %             similarity = zeros(1, length(this.Cases));
