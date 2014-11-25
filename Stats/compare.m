@@ -1,7 +1,9 @@
-classifications = zeros(10, 2, 6); % Fold, algorithm, emotion.
 treeIndex = 1;
 netIndex = 2;
+caseIndex = 3;
 
+if exist('classifications', 'var') ~= 1
+classifications = zeros(10, 3, 6); % Fold, algorithm, emotion.
 for fold=1:10,
     fprintf('Fold %d:\n', fold);
     
@@ -47,12 +49,22 @@ for fold=1:10,
     netConfusion.updateFromNet(net, testInputs, testOutputs);
     classifications(fold, netIndex, :) = netConfusion.getClassifications();
     fprintf('Done.\n');
+    
+    % Test the case based reasoning.
+    % Coming soon.
+end
+else
+    fprintf('Previous classifications found - skipping training and testing.\n');
 end
 
-fprintf('Decision tree:\n');
-disp(forestConfusion.Matrix);
-disp(forestConfusion.getAccuracy());
+% Test for any significant differences between the algorithms.
+results = zeros(3, 6);
+treeNetIndex = 1;
+treeCaseIndex = 2;
+NetCaseIndex = 3;
+for emotion=1:6,
+    results(treeNetIndex, emotion) = ttest2(classifications(:, treeIndex, emotion), classifications(:, netIndex, emotion));
+end
 
-fprintf('Neural network:\n');
-disp(netConfusion.Matrix);
-disp(netConfusion.getAccuracy());
+fprintf('\nResults:\n');
+disp(results);
