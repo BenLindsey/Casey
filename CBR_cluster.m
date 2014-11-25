@@ -8,7 +8,7 @@ classdef CBR_cluster
         
        function this = CBR_cluster(x,y)
             
-            weights=zeros(6,45);
+            weights=zeros(6,45,2);  % 3rd dim: weigths +ve and -ve
                     
             cases={[],[],[],[],[],[]};
             
@@ -22,11 +22,17 @@ classdef CBR_cluster
                 
                 cases{y(ol)} = [cases{y(ol)} caseClus(getAU(x(ol,:)), y(ol))]; %caseCLus creates new case with xAU and y as inputs
                                
-                % update weights of cluster
+                % update +ve weights of cluster
                 
-                weights(y(ol),cases{y(ol)}(end).AUs) = weights(y(ol),cases{y(ol)}(end).AUs) + 1; % adds +1 to all (row=emotion, col=+ve AU for sample) of weights
-                            
-              
+                weights( y(ol), cases{y(ol)}(end).AUs, 1) = weights(y(ol), cases{y(ol)}(end).AUs, 1) + 1; % adds +1 to all (row=emotion, col=+ve AU for sample) of weights (:,:,1)
+                
+                % update -ve weights of cluster
+                
+                AUneg=1:size(x,2);  
+                AUneg(cases{y(ol)}(end).AUs)=[];    %AU neg contains indexes of negative attributes
+                
+                weights( y(ol), AUneg, 2) = weights(y(ol), AUneg, 2) + 1; % adds +1 to all (row=emotion, col=-ve AU for sample) of weights (:,:,2)
+                 
             
                 %% for every new sample, it checks the same exact sample does not already exists 
                               
@@ -43,12 +49,27 @@ classdef CBR_cluster
                             
                             break;  %out of for
                         end 
-                end
+               end
                 
-            end     
                 
-                this.cases=cases;
-                this.weights=weights;
+            end  
+            
+            %% creates indexes of importance of cases
+            
+%             for clus = 1:length(cases)   %for each cluster
+%                 
+%                 for il = 2: length(cases{clus}) 
+%                     
+%                     
+%                     
+%                 end                
+%             
+%             end
+            
+            %% updates calss properties
+            
+            this.cases=cases;
+            this.weights=weights;
              
        end
                
