@@ -3,11 +3,13 @@ classdef Case
         Typicality
         Emotion
         AUs
+        OriginalAUs
     end
     
     methods
         function this = Case(AUs, emotion)
             this.Typicality = 0;
+            this.OriginalAUs = AUs;
             this.AUs = [];
             
             for i=1:length(AUs)
