@@ -17,7 +17,7 @@ classdef leaf
             elseif ~isempty(toVisit)
                 x = toVisit{1}.bfs(example, emotions(2:end), toVisit);
             else
-                x = -1;
+                x = emotions(1);
             end
         end
         

@@ -6,7 +6,6 @@ classdef confusionmatrix < handle
 
     methods
         function this = confusionmatrix()
-
             % Initialise the confusion matrix.
             this.Matrix = zeros(6, 6);
         end
@@ -18,6 +17,18 @@ classdef confusionmatrix < handle
             for i=1:size(inputs, 1)
                 this.Matrix(outputs(i), actuals(i)) = ...
                         this.Matrix(outputs(i), actuals(i)) + 1;
+            end
+        end
+        
+        function updateFromForest(this, forest, inputs, outputs)
+            % Test the forest on each entry in the training data, then
+            % increment the corresponding element in the matrix.
+            for row=1:length(inputs),
+                emotion = forest.getEmotionViaBfs(inputs(row,:));
+                actualEmotion = outputs(row);
+                
+                this.Matrix(actualEmotion, emotion) = ...
+                    this.Matrix(actualEmotion, emotion) + 1;
             end
         end
         
