@@ -1,5 +1,5 @@
 % TODOS:
-%   * Use parfor to calculate the classification errors.
+%   * Update the saved classifications.
 %   * Adjust significance level to answer question 2.
 %   * Check that ttest2 is the right function.
 %   * Check that getClassifications in the confusion matrix is correct.
@@ -9,30 +9,33 @@ netIndex = 2;
 cbrIndex = 3;
 
 if exist('classifications', 'var') ~= 1
-classifications = zeros(10, 3, 6); % Fold, algorithm, emotion.
-for fold=1:10,
-    fprintf('Fold %d:\n', fold);
+classifications = cell(10, 1); % Classifications per fold.
+fprintf('Completed folds:');
+parfor fold=1:10,
+    %fprintf('Fold %d:\n', fold);
+    
+    classifications{fold} = zeros(3, 6); % Algorithm, emotion.
     
     % Split into training and test sets.
+    testIndexes = fold:10:size(x, 1);
     trainInputs = x;
     trainInputs(fold:10:end, :) = [];
     trainOutputs = y;
     trainOutputs(fold:10:end) = [];
-    
     testInputs = x(fold:10:end, :);
-    testOutputs = y(fold:10:end);
+    testOutputs = y(testIndexes); % Doesn't compile unless the index is extracted?
     
     % Train and test the decision tree.
-    fprintf('\tDecision tree: Training ... ');
+    %fprintf('\tDecision tree: Training ... ');
     f = forest(trainInputs, trainOutputs);
-    fprintf('Testing ... ');
+    %fprintf('Testing ... ');
     forestConfusion = confusionmatrix();
     forestConfusion.updateFromForest(f, testInputs, testOutputs);
-    classifications(fold, treeIndex, :) = forestConfusion.getClassifications();
-    fprintf('Done\n');
+    classifications{fold}(treeIndex, :) = forestConfusion.getClassifications();
+    %fprintf('Done\n');
     
     % Test the neural network with the best parameters.
-    fprintf('\tNeural net: Training ... ');
+    %fprintf('\tNeural net: Training ... ');
     hiddenNeurons = 26;
     deltaInc = 1.4217;
     deltaDec = 0.5094;
@@ -50,34 +53,40 @@ for fold=1:10,
     net.divideParam.valInd = valInd;
     net.divideParam.testInd = [];
     net = train(net, tI, tO);
-    fprintf('Testing ... ');
+    %fprintf('Testing ... ');
     netConfusion = confusionmatrix();
     netConfusion.updateFromNet(net, testInputs, testOutputs);
-    classifications(fold, netIndex, :) = netConfusion.getClassifications();
-    fprintf('Done.\n');
+    classifications{fold}(netIndex, :) = netConfusion.getClassifications();
+    %fprintf('Done.\n');
     
     % Test the case based reasoning.
-    fprintf('\tCBR: Training ... ');
+    %fprintf('\tCBR: Training ... ');
     cbr = CBRinit(trainInputs, trainOutputs);
-    fprintf('Testing ... ');
+    %fprintf('Testing ... ');
     cbrConfusion = confusionmatrix();
     cbrConfusion.update(cbr, testInputs, testOutputs);
-    classifications(fold, cbrIndex, :) = cbrConfusion.getClassifications();
-    fprintf('Done.\n');
+    classifications{fold}(cbrIndex, :) = cbrConfusion.getClassifications();
+    %fprintf('Done.\n');
+    fprintf(' %d', fold);
 end
 else
     fprintf('Previous classifications found - skipping training and testing.\n');
 end
 
+classificationsMatrix = cell2mat(classifications);
+treeClassifications = classificationsMatrix(treeIndex:3:end, :);
+netClassifications = classificationsMatrix(netIndex:3:end, :);
+cbrClassifications = classificationsMatrix(cbrIndex:3:end, :);
+
 % Test for any significant differences between the algorithms.
 results = zeros(3, 6);
 treeNetIndex = 1;
 treeCbrIndex = 2;
-NetCbrIndex = 3;
+netCbrIndex = 3;
 for emotion=1:6,
-    results(treeNetIndex, emotion) = ttest2(classifications(:, treeIndex, emotion), classifications(:, netIndex, emotion));
-    results(treeCbrIndex, emotion) = ttest2(classifications(:, treeIndex, emotion), classifications(:, cbrIndex, emotion));
-    results(NetCbrIndex, emotion) = ttest2(classifications(:, netIndex, emotion), classifications(:, cbrIndex, emotion));
+    results(treeNetIndex, emotion) = ttest2(treeClassifications(:, emotion), netClassifications(:, emotion));
+    results(treeCbrIndex, emotion) = ttest2(treeClassifications(:, emotion), cbrClassifications(:, emotion));
+    results(netCbrIndex, emotion) = ttest2(netClassifications(:, emotion), cbrClassifications(:, emotion));
 end
 
 printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
