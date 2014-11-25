@@ -1,3 +1,9 @@
+% TODOS:
+%   * Use parfor to calculate the classification errors.
+%   * Adjust significance level to answer question 2.
+%   * Check that ttest2 is the right function.
+%   * Check that getClassifications in the confusion matrix is correct.
+
 treeIndex = 1;
 netIndex = 2;
 cbrIndex = 3;
@@ -74,5 +80,4 @@ for emotion=1:6,
     results(NetCbrIndex, emotion) = ttest2(classifications(:, netIndex, emotion), classifications(:, cbrIndex, emotion));
 end
 
-fprintf('\nResults:\n');
-disp(results);
+printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
