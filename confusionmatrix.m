@@ -32,6 +32,16 @@ classdef confusionmatrix < handle
             end
         end
         
+        function updateFromNet(this, net, inputs, outputs)
+            % Test the forest on each entry in the training data, then           
+            % increment the corresponding element in the matrix.                 
+            emotion = testANN(net, inputs);                                      
+            for idx=1:length(emotion)                                            
+                this.Matrix(outputs(idx), emotion(idx)) = ...                    
+                    this.Matrix(outputs(idx), emotion(idx)) + 1;             
+            end 
+        end
+        
         % Functions for part III, these functions calculate the basic
         % properties from the slides;
         
