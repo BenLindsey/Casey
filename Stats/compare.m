@@ -1,6 +1,6 @@
 treeIndex = 1;
 netIndex = 2;
-caseIndex = 3;
+cbrIndex = 3;
 
 if exist('classifications', 'var') ~= 1
 classifications = zeros(10, 3, 6); % Fold, algorithm, emotion.
@@ -51,7 +51,13 @@ for fold=1:10,
     fprintf('Done.\n');
     
     % Test the case based reasoning.
-    % Coming soon.
+    fprintf('\tCBR: Training ... ');
+    cbr = CBRinit(trainInputs, trainOutputs);
+    fprintf('Testing ... ');
+    cbrConfusion = confusionmatrix();
+    cbrConfusion.update(cbr, testInputs, testOutputs);
+    classifications(fold, cbrIndex, :) = cbrConfusion.getClassifications();
+    fprintf('Done.\n');
 end
 else
     fprintf('Previous classifications found - skipping training and testing.\n');
@@ -60,10 +66,12 @@ end
 % Test for any significant differences between the algorithms.
 results = zeros(3, 6);
 treeNetIndex = 1;
-treeCaseIndex = 2;
-NetCaseIndex = 3;
+treeCbrIndex = 2;
+NetCbrIndex = 3;
 for emotion=1:6,
     results(treeNetIndex, emotion) = ttest2(classifications(:, treeIndex, emotion), classifications(:, netIndex, emotion));
+    results(treeCbrIndex, emotion) = ttest2(classifications(:, treeIndex, emotion), classifications(:, cbrIndex, emotion));
+    results(NetCbrIndex, emotion) = ttest2(classifications(:, netIndex, emotion), classifications(:, cbrIndex, emotion));
 end
 
 fprintf('\nResults:\n');
