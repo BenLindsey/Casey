@@ -7,7 +7,7 @@ classdef Case
     
     methods
         function this = Case(AUs, emotion)
-            this.Typicality = 0;
+            this.Typicality = 1;
             this.AUs = [];
             
             for i=1:length(AUs)
