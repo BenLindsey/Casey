@@ -1,7 +1,10 @@
-forestConfusion = confusionmatrix();
-netConfusion = confusionmatrix();
+classifications = zeros(10, 2, 6); % Fold, algorithm, emotion.
+treeIndex = 1;
+netIndex = 2;
 
 for fold=1:10,
+    fprintf('Fold %d:\n', fold);
+    
     % Split into training and test sets.
     trainInputs = x;
     trainInputs(fold:10:end, :) = [];
@@ -11,11 +14,17 @@ for fold=1:10,
     testInputs = x(fold:10:end, :);
     testOutputs = y(fold:10:end);
     
-    % Test the decision tree.
+    % Train and test the decision tree.
+    fprintf('\tDecision tree: Training ... ');
     f = forest(trainInputs, trainOutputs);
+    fprintf('Testing ... ');
+    forestConfusion = confusionmatrix();
     forestConfusion.updateFromForest(f, testInputs, testOutputs);
+    classifications(fold, treeIndex, :) = forestConfusion.getClassifications();
+    fprintf('Done\n');
     
-    % Test the neural network.
+    % Test the neural network with the best parameters.
+    fprintf('\tNeural net: Training ... ');
     hiddenNeurons = 26;
     deltaInc = 1.4217;
     deltaDec = 0.5094;
@@ -33,7 +42,11 @@ for fold=1:10,
     net.divideParam.valInd = valInd;
     net.divideParam.testInd = [];
     net = train(net, tI, tO);
+    fprintf('Testing ... ');
+    netConfusion = confusionmatrix();
     netConfusion.updateFromNet(net, testInputs, testOutputs);
+    classifications(fold, netIndex, :) = netConfusion.getClassifications();
+    fprintf('Done.\n');
 end
 
 fprintf('Decision tree:\n');

@@ -49,6 +49,19 @@ classdef confusionmatrix < handle
         function accuracy = getAccuracy(this)
             accuracy = trace(this.Matrix) / sum(this.Matrix(:));
         end
+        
+        function classifications = getClassifications(this)
+            classifications = arrayfun(@getClassificationFor, repmat(this, 1, 6), 1:6);
+        end
+        
+        function classification = getClassificationFor(this, class)
+            trueNegatives = this.Matrix;
+            trueNegatives(class, :) = [];
+            trueNegatives(:, class) = [];
+            
+            classification = (this.Matrix(class, class) + sum(trueNegatives(:))) ...
+                / sum(this.Matrix(:));
+        end
 
         % Return the recall rate of the given class.
         function recallRate = getRecallRate(this, class)
