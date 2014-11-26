@@ -73,10 +73,12 @@ results = zeros(3, 6);
 treeNetIndex = 1;
 treeCbrIndex = 2;
 netCbrIndex = 3;
+alpha = 0.05 / 3;
 for emotion=1:6,
-    results(treeNetIndex, emotion) = ttest2(treeClassifications(:, emotion), netClassifications(:, emotion));
-    results(treeCbrIndex, emotion) = ttest2(treeClassifications(:, emotion), cbrClassifications(:, emotion));
-    results(netCbrIndex, emotion) = ttest2(netClassifications(:, emotion), cbrClassifications(:, emotion));
+    results(treeNetIndex, emotion) = ttest2(treeClassifications(:, emotion), netClassifications(:, emotion), 'Alpha', alpha);
+    results(treeCbrIndex, emotion) = ttest2(treeClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
+    results(netCbrIndex, emotion) = ttest2(netClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
 end
 
+fprintf('Significance level = %f.\n', alpha);
 printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
