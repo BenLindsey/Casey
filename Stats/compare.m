@@ -1,7 +1,8 @@
 % TODOS:
-%   * Adjust significance level to answer question 2.
-%   * Check that ttest2 is the right function.
+%   * Adjust significance level to answer question 2. (3 or 30?)
 %   * Check that getClassifications in the confusion matrix is correct.
+%   * Is it correct to train each algorithm? The submitted structures were
+%     trained on the entire data set.
 
 treeIndex = 1;
 netIndex = 2;
@@ -74,10 +75,11 @@ treeNetIndex = 1;
 treeCbrIndex = 2;
 netCbrIndex = 3;
 alpha = 0.05 / 3;
+testFcn = @ttest;
 for emotion=1:6,
-    results(treeNetIndex, emotion) = ttest2(treeClassifications(:, emotion), netClassifications(:, emotion), 'Alpha', alpha);
-    results(treeCbrIndex, emotion) = ttest2(treeClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
-    results(netCbrIndex, emotion) = ttest2(netClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
+    results(treeNetIndex, emotion) = testFcn(treeClassifications(:, emotion), netClassifications(:, emotion), 'Alpha', alpha);
+    results(treeCbrIndex, emotion) = testFcn(treeClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
+    results(netCbrIndex, emotion) = testFcn(netClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
 end
 
 fprintf('Significance level = %f.\n', alpha);
