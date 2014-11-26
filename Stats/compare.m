@@ -1,5 +1,4 @@
 % TODOS:
-%   * Update the saved classifications.
 %   * Adjust significance level to answer question 2.
 %   * Check that ttest2 is the right function.
 %   * Check that getClassifications in the confusion matrix is correct.
@@ -12,8 +11,6 @@ if exist('classifications', 'var') ~= 1
 classifications = cell(10, 1); % Classifications per fold.
 fprintf('Completed folds:');
 parfor fold=1:10,
-    %fprintf('Fold %d:\n', fold);
-    
     classifications{fold} = zeros(3, 6); % Algorithm, emotion.
     
     % Split into training and test sets.
@@ -26,16 +23,12 @@ parfor fold=1:10,
     testOutputs = y(testIndexes); % Doesn't compile unless the index is extracted?
     
     % Train and test the decision tree.
-    %fprintf('\tDecision tree: Training ... ');
     f = forest(trainInputs, trainOutputs);
-    %fprintf('Testing ... ');
     forestConfusion = confusionmatrix();
     forestConfusion.updateFromForest(f, testInputs, testOutputs);
     classifications{fold}(treeIndex, :) = forestConfusion.getClassifications();
-    %fprintf('Done\n');
     
     % Test the neural network with the best parameters.
-    %fprintf('\tNeural net: Training ... ');
     hiddenNeurons = 26;
     deltaInc = 1.4217;
     deltaDec = 0.5094;
@@ -52,21 +45,18 @@ parfor fold=1:10,
     net.divideParam.trainInd = trainInd;
     net.divideParam.valInd = valInd;
     net.divideParam.testInd = [];
+    net.trainParam.show = NaN;
     net = train(net, tI, tO);
-    %fprintf('Testing ... ');
     netConfusion = confusionmatrix();
     netConfusion.updateFromNet(net, testInputs, testOutputs);
     classifications{fold}(netIndex, :) = netConfusion.getClassifications();
-    %fprintf('Done.\n');
     
     % Test the case based reasoning.
-    %fprintf('\tCBR: Training ... ');
     cbr = CBRinit(trainInputs, trainOutputs);
-    %fprintf('Testing ... ');
     cbrConfusion = confusionmatrix();
     cbrConfusion.update(cbr, testInputs, testOutputs);
     classifications{fold}(cbrIndex, :) = cbrConfusion.getClassifications();
-    %fprintf('Done.\n');
+    
     fprintf(' %d', fold);
 end
 else
