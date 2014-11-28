@@ -26,7 +26,7 @@ classdef CBR_cluster
             weights( newcase.Emotion, newcase.AUs, 2) = weights(newcase.Emotion, newcase.AUs, 2) + 1; % adds +1 to all (row=emotion, col=+ve AU for sample) of weights (:,:,1)
 
             % update -ve weights of cluster
-            AUneg = 1 : size(weights, 2);  
+            AUneg = 1 : size(weights, 2); 
 
             AUneg(newcase.AUs) = [];    %AU neg contains indexes of negative attributes
 
@@ -73,22 +73,24 @@ classdef CBR_cluster
                 
                 for ol = 2 : length(cases{clus}) 
                     
-                    for il = 1 : (ol-1)
-                        
-                        attribLogical = zeros(1,size(weights,2));
-                        attribLogical( cases{clus}(ol).AUs ) = 1;
-                        importanceOL = ( weights(clus,:,2) .* attribLogical ) + ( weights(clus,:,1) .* ~attribLogical );
-                        
+                    attribLogical = zeros(1,size(weights,2));
+                    attribLogical( cases{clus}(ol).AUs ) = 1;
+                    % attribLogical is a mask for current ol attributes
+                    importanceOL = ( weights(clus,:,2) .* attribLogical ) + ( weights(clus,:,1) .* ~attribLogical );
+                    
+                    for il = 1 : (ol-1)                     
                         
                         attribLogical = zeros(1,size(weights,2));
                         attribLogical( cases{clus}(il).AUs ) = 1;
                         importanceIL = ( weights(clus,:,2) .* attribLogical ) + ( weights(clus,:,1) .* ~attribLogical );
                         
+                        % (insertion) sort cluster by importance?
+                        % TODO: use in built sort, need comparator of
+                        % importance
                         if importanceOL > importanceIL
                             
-                            caseOL = cases{clus}(ol);
-                            cases{clus}(ol) = [];
                             cases{clus}(il) = [cases{clus}(ol), cases{clus}(il)];
+                            cases{clus}(ol) = [];
                             
                         end
                         
@@ -109,32 +111,46 @@ classdef CBR_cluster
                     
             % normalises weights
 
-            for clus = 1:length(this.cases)
+            for clus = 1:length(this.Cases)
 
-                if ~isempty(this.cases{clus})
-                    weights(clus,:,:) = weights(clus,:,:) / (size(weights,2) * length(this.cases{clus}) );
+                if ~isempty(this.Cases{clus})
+                    weights(clus,:,:) = weights(clus,:,:) / (size(weights,2) * length(this.Cases{clus}) );
                 end    
 
             end  
      
-            similarity = zeros(1, length(this.cases));
-            for clus = 1:length(this.cases)
-                if ~isempty(this.cases{clus})
-                    similarity(clus) = similarFunc(this.cases{clus}(1), newcase, weights);
+            similarity = zeros(1, length(this.Cases));
+            for clus = 1:length(this.Cases)
+                if ~isempty(this.Cases{clus})
+                    % First case in cluster should be best match due to
+                    % indexing (sorting) above?
+                    similarity(clus) = similarFunc(this.Cases{clus}(1), newcase, weights);
                 end    
             end
             
-            minRange = max(similarity)- (max(similarity) - min(similarity)) / 20;
+            % We've retrieved the similarity of the new case with the best
+            % case from each cluster, now only take the top few
             
+            minRange = max(similarity)- (max(similarity) - min(similarity)) / 20; % why 20?
+            
+            % ranV holds the index of clusters with the top similarities
+            % (based on importance)
             ranV = find (similarity > minRange);
-            similClus = zeros (1,length(ranV));
-            similCase = zeros (1,length( ranV));
             
+            % similClus hold the best similarity for each cluster
+            similClus = zeros (1,length(ranV));
+            
+            %similCase holds the index of the case with the best similarity
+            %for each cluster
+            similCase = zeros (1,length(ranV));
+            
+            % Loop through all cases in each of our chosen clusters and
+            % find the REAL best case (one with highest similarity)
             for clus = 1:length(ranV)                
 
-                for cas = 1:length(this.cases{ranV(clus)})
+                for cas = 1:length(this.Cases{ranV(clus)})
                     
-                    similarity = similarFunc(this.cases{ranV(clus)}(cas), newcase, weights);
+                    similarity = similarFunc(this.Cases{ranV(clus)}(cas), newcase, weights);
                     
                     if similarity > similClus(clus)
                         similClus(clus) = similarity;
@@ -142,12 +158,15 @@ classdef CBR_cluster
                     end
                 end
             end         
-       
-            emot = (find(similClus == max (similClus)))
-            % if emot more than 1????
-            ranV(emot(1))
-            similCase(emot(1))
-            similarcase = this.cases{ranV(emot(1))}(similCase(emot(1)));
+            
+            % Get the index of the cluster with the highest similarity -
+            % this is our chosen emotion
+            disp(similClus)
+            emot = find(similClus == max(similClus))
+            
+            % if emot more than 1???? (i.e two emotions have the same best
+            % similarity) - currently pick the first one
+            similarcase = this.Cases{emot(1)}(similCase(emot(1)));
 
 %             disp(similarity);
 %             
