@@ -3,6 +3,7 @@ classdef caseClus
         Typicality
         Emotion
         AUs
+        OriginalAUs
     end
     
     methods
@@ -11,6 +12,9 @@ classdef caseClus
             this.AUs=AUs;
             
             this.Emotion    = emotion; 
+            
+            this.OriginalAUs=zeros(1,45);
+            this.OriginalAUs(AUs)=1;
         end
     end
      
