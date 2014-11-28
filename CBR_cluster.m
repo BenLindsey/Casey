@@ -13,8 +13,8 @@ classdef CBR_cluster
                
 
         function this = retain(this, newcase)    
-            addCase(this, newcase);
-            updateIndexes(this);           
+            this = addCase(this, newcase);
+            this = updateIndexes(this);           
         end
         
         function this = addCase(this, newcase)
@@ -118,18 +118,26 @@ classdef CBR_cluster
                 end    
 
             end  
-     
+            
+            empty = true;
             similarity = zeros(1, length(this.Cases));
             for clus = 1:length(this.Cases)
                 if ~isempty(this.Cases{clus})
                     % First case in cluster should be best match due to
                     % indexing (sorting) above?
                     similarity(clus) = similarFunc(this.Cases{clus}(1), newcase, weights);
+                    empty = false;
                 end    
             end
             
+            % Check training works ok
+            if empty
+                fprintf('\nERROR: No cases in cbr system - have you trained the cbr?\n');
+            end
+            
             % We've retrieved the similarity of the new case with the best
-            % case from each cluster, now only take the top few
+            % case from each cluster, now only take the top few (k-nearest
+            % neighbour)
             
             minRange = max(similarity)- (max(similarity) - min(similarity)) / 20; % why 20?
             
@@ -161,19 +169,11 @@ classdef CBR_cluster
             
             % Get the index of the cluster with the highest similarity -
             % this is our chosen emotion
-            disp(similClus)
-            emot = find(similClus == max(similClus))
+            emot = find(similClus == max(similClus));
             
             % if emot more than 1???? (i.e two emotions have the same best
             % similarity) - currently pick the first one
             similarcase = this.Cases{emot(1)}(similCase(emot(1)));
-
-%             disp(similarity);
-%             
-%             [~,idx] = sort(similarity);
-% 
-%             similarcase = this.Cases(idx(end));
-
         end
         
     end
