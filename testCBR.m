@@ -5,6 +5,7 @@ function [ predictions ] = testCBR( CBR, x2 )
         solvedcase = reuse(retrieve(CBR, newcase), newcase);
         CBR = retain(CBR, solvedcase);
         predictions(i) = solvedcase.Emotion;
+        disp(i);
     end 
 end
 
