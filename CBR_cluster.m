@@ -55,8 +55,8 @@ classdef CBR_cluster
                 if ~isempty(this.Cases{clus})
                     % First case in cluster should be best match due to
                     % indexing (sorting) above?
-                    similarity(clus) = sum(( weights(clus,:,2) .* newcase.OriginalAUs ).^2) ...
-                        + sum(( weights(clus,:,1) .* ~newcase.OriginalAUs ).^2);
+                    similarity(clus) = sqrt(sum(( weights(clus,:,2) .* newcase.OriginalAUs ).^2) ...
+                        + sum(( weights(clus,:,1) .* ~newcase.OriginalAUs ).^2));
                     
                     empty = false;
                 end    
