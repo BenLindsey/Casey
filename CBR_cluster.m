@@ -23,7 +23,7 @@ classdef CBR_cluster
             emot    = newcase.Emotion;
 
             % update +ve weights of cluster
-            weights( newcase.Emotion, newcase.AUs, 2) = weights(newcase.Emotion, newcase.AUs, 2) + 1; % adds +1 to all (row=emotion, col=+ve AU for sample) of weights (:,:,1)
+            weights(newcase.Emotion, newcase.AUs, 2) = weights(newcase.Emotion, newcase.AUs, 2) + 1; % adds +1 to all (row=emotion, col=+ve AU for sample) of weights (:,:,1)
 
             % update -ve weights of cluster
             AUneg = 1 : size(weights, 2); 
@@ -31,10 +31,8 @@ classdef CBR_cluster
             AUneg(newcase.AUs) = [];    %AU neg contains indexes of negative attributes
 
             weights( newcase.Emotion, AUneg, 1) = weights(newcase.Emotion, AUneg, 1) + 1; % adds +1 to all (row=emotion, col=-ve AU for sample) of weights (:,:,2)
-
-
+     
             % for every new sample, it checks the same exact sample does not already exists 
-
 
             for il = 1 : length( cases{emot} ) % steps through all cases classified as emotion of sample
 
@@ -65,43 +63,15 @@ classdef CBR_cluster
         
         
         function this = updateIndexes(this) % creates indexes of importance of cases
-            
-            cases   = this.Cases;
-            weights = this.Weights;
 
-            for clus = 1 : length(cases)   % for each cluster
+            for clus = 1 : length(this.Cases)   % for each cluster                        
+                importance = arrayfun(@(x) (sum( this.Weights(clus,:,2) .* x.OriginalAUs ) ...
+                    + sum( this.Weights(clus,:,1) .* ~x.OriginalAUs )), this.Cases{clus});
                 
-                for ol = 2 : length(cases{clus}) 
+                [~, idx] = sort(importance);
                     
-                    attribLogical = zeros(1,size(weights,2));
-                    attribLogical( cases{clus}(ol).AUs ) = 1;
-                    % attribLogical is a mask for current ol attributes
-                    importanceOL = ( weights(clus,:,2) .* attribLogical ) + ( weights(clus,:,1) .* ~attribLogical );
-                    
-                    for il = 1 : (ol-1)                     
-                        
-                        attribLogical = zeros(1,size(weights,2));
-                        attribLogical( cases{clus}(il).AUs ) = 1;
-                        importanceIL = ( weights(clus,:,2) .* attribLogical ) + ( weights(clus,:,1) .* ~attribLogical );
-                        
-                        % (insertion) sort cluster by importance?
-                        % TODO: use in built sort, need comparator of
-                        % importance
-                        if importanceOL > importanceIL
-                            
-                            cases{clus}(il) = [cases{clus}(ol), cases{clus}(il)];
-                            cases{clus}(ol) = [];
-                            
-                        end
-                        
-                    end
-                    
-                end                
-            
-            end
-            
-            this.Weights = weights;
-            this.Cases   = cases;       
+                this.Cases{clus} = this.Cases{clus}(idx);
+            end      
             
         end 
                
@@ -148,8 +118,8 @@ classdef CBR_cluster
             % similClus hold the best similarity for each cluster
             similClus = zeros (1,length(ranV));
             
-            %similCase holds the index of the case with the best similarity
-            %for each cluster
+            % similCase holds the index of the case with the best similarity
+            % for each cluster
             similCase = zeros (1,length(ranV));
             
             % Loop through all cases in each of our chosen clusters and
@@ -171,9 +141,14 @@ classdef CBR_cluster
             % this is our chosen emotion
             emot = find(similClus == max(similClus));
             
+%             disp(emot);
+%             disp(similCase);
+%             disp(similClus);
+%             disp(this.Cases);
+            
             % if emot more than 1???? (i.e two emotions have the same best
             % similarity) - currently pick the first one
-            similarcase = this.Cases{emot(1)}(similCase(emot(1)));
+            similarcase = this.Cases{ranV(emot(1))}(similCase(emot(1)));
         end
         
     end
