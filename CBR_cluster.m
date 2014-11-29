@@ -68,7 +68,7 @@ classdef CBR_cluster
                 importance = arrayfun(@(x) (sum( this.Weights(clus,:,2) .* x.OriginalAUs ) ...
                     + sum( this.Weights(clus,:,1) .* ~x.OriginalAUs )), this.Cases{clus});
                 
-                [~, idx] = sort(importance);
+                [~, idx] = sort(importance, 'descend');
                     
                 this.Cases{clus} = this.Cases{clus}(idx);
             end      
