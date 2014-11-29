@@ -10,7 +10,7 @@ classdef CBR_flat
         function similarcase = retrieveCase(this, newcase, similarFunc)
             similarity = zeros(1, length(this.Cases));
     
-            parfor i = 1:length(this.Cases)
+            for i = 1:length(this.Cases)
                 similarity(i) = similarFunc(this.Cases(i), newcase, ones([6, 45, 2]));
             end
             

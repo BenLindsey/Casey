@@ -11,7 +11,18 @@ classdef CBR_cluster
             this.Cases = {[],[],[],[],[],[]};             
         end
         
-        function this = retainCase(this, newcase)             
+        function this = retainCase(this, newcase) 
+            
+            for il = 1:length(this.Cases{newcase.Emotion}) % steps through all cases classified as emotion of sample
+                %  if sample case (<-end) have same AUs as case(il) (for emotion)  
+                if (isequal(newcase.AUs, this.Cases{newcase.Emotion}(il).AUs))
+                    this.Cases{newcase.Emotion}(il).Typicality = ...
+                        this.Cases{newcase.Emotion}(il).Typicality + 1;   % increases sums typic. of cases -> into first case
+
+                    return;
+                end        
+            end
+            
             % update +ve weights of cluster
             % adds +1 to all (row=emotion, col=+ve AU for sample) of weights (:,:,1)
             this.Weights(newcase.Emotion, newcase.AUs, 2) = ...
@@ -23,19 +34,7 @@ classdef CBR_cluster
 
             this.Weights(newcase.Emotion, AUneg, 1) = ...
                 this.Weights(newcase.Emotion, AUneg, 1) + 1; % adds +1 to all (row=emotion, col=-ve AU for sample) of weights (:,:,2)
-     
-            % for every new sample, it checks the same exact sample does not already exists 
-
-            for il = 1:length(this.Cases{newcase.Emotion}) % steps through all cases classified as emotion of sample
-                %  if sample case (<-end) have same AUs as case(il) (for emotion)  
-                if (isequal(newcase.AUs, this.Cases{newcase.Emotion}(il).AUs))
-                    this.Cases{newcase.Emotion}(il).Typicality = ...
-                        this.Cases{newcase.Emotion}(il).Typicality + 1;   % increases sums typic. of cases -> into first case
-
-                    return;
-                end        
-            end
-            
+   
             % appends case to {emotion} cell in cluster
             this.Cases{newcase.Emotion} = [this.Cases{newcase.Emotion}, newcase];
         end    
@@ -56,8 +55,8 @@ classdef CBR_cluster
                 if ~isempty(this.Cases{clus})
                     % First case in cluster should be best match due to
                     % indexing (sorting) above?
-                    similarity(clus) = sum( weights(clus,:,2) .* newcase.OriginalAUs ) ...
-                        + sum( weights(clus,:,1) .* ~newcase.OriginalAUs );
+                    similarity(clus) = sum(( weights(clus,:,2) .* newcase.OriginalAUs ).^2) ...
+                        + sum(( weights(clus,:,1) .* ~newcase.OriginalAUs ).^2);
                     
                     empty = false;
                 end    
@@ -72,7 +71,7 @@ classdef CBR_cluster
             % case from each cluster, now only take the top few (k-nearest
             % neighbour)
             
-            minRange = max(similarity) - (max(similarity) - min(similarity)) / 1; % why 2?
+            minRange = max(similarity) - (max(similarity) - min(similarity)) / 2;
             
             % ranV holds the index of clusters with the top similarities
             % (based on importance)
@@ -86,7 +85,7 @@ classdef CBR_cluster
             % find the REAL best case (one with highest similarity)
             for CLUSTER = bestClusters 
                 for CASE = this.Cases{CLUSTER} 
-                    similarity = similarFunc(CASE, newcase, ones([6 45 2]));
+                    similarity = similarFunc(CASE, newcase, weights);
                     
                     if similarity > bestSimilarity
                         bestSimilarity = similarity;
