@@ -12,7 +12,7 @@ classdef CBR_cluster
         end
                
 
-        function this = retain(this, newcase)    
+        function this = retainCase(this, newcase)    
             this = addCase(this, newcase);
             this = updateIndexes(this);           
         end
@@ -105,7 +105,7 @@ classdef CBR_cluster
             
         end 
                
-        function similarcase = retrieve(this, newcase, similarFunc)
+        function similarcase = retrieveCase(this, newcase, similarFunc)
      
             weights = this.Weights;
                     
