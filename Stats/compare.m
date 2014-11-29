@@ -83,4 +83,5 @@ for emotion=1:6,
 end
 
 fprintf('Significance level = %f.\n', alpha);
-printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
+%printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
+disp(results);
