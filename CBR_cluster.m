@@ -5,14 +5,12 @@ classdef CBR_cluster
     end
     
     methods
-        
         function this = CBR_cluster()
             this.Weights = zeros(6, 45, 2);  % 3rd dim: weigths -ve and +ve                   
             this.Cases = {[],[],[],[],[],[]};             
         end
         
         function this = retainCase(this, newcase) 
-            
             for il = 1:length(this.Cases{newcase.Emotion}) % steps through all cases classified as emotion of sample
                 %  if sample case (<-end) have same AUs as case(il) (for emotion)  
                 if (isequal(newcase.AUs, this.Cases{newcase.Emotion}(il).AUs))
