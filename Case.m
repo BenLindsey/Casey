@@ -1,4 +1,4 @@
-classdef Case
+classdef Case < handle
     properties
         Typicality
         Emotion
@@ -7,11 +7,16 @@ classdef Case
     end
     
     methods
-        function this = Case(AUs, emotion)
+        function this = Case(varargin)
+            if(length(varargin) == 2) 
+                this.Emotion = varargin{2};
+            else
+                this.Emotion = -1;
+            end
+            
             this.Typicality = 1;
-            this.AUs = getAU(AUs);
-            this.OriginalAUs = AUs;
-            this.Emotion = emotion; 
+            this.AUs = find(varargin{1});
+            this.OriginalAUs = varargin{1};
         end
     end
      

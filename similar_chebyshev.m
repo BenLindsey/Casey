@@ -12,8 +12,6 @@ function [ similarity ] = similar_chebyshev( caseA, caseB, weights )
         % weight, otherwise use 0.
         if (caseA.OriginalAUs(i) && caseB.OriginalAUs(i))
             current = weights(caseA.Emotion, i, 2);
-        elseif (~caseA.OriginalAUs(i) && ~caseB.OriginalAUs(i))
-            current = weights(caseA.Emotion, i, 1);
         end 
         
         % Update the maximum weight found.
