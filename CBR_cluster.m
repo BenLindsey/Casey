@@ -76,7 +76,7 @@ classdef CBR_cluster
             % case from each cluster, now only take the top few (k-nearest
             % neighbour)
             
-            minRange = max(similarity) - (max(similarity) - min(similarity)) / 5;
+            minRange = max(similarity) - (max(similarity) - min(similarity)) / 2;
             
             [ordered_similarity, clusters] = sort(similarity, 'descend');
             bestClusters = clusters(ordered_similarity >= minRange);
