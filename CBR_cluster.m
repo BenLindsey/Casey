@@ -60,10 +60,8 @@ classdef CBR_cluster
             similarity = zeros(1, length(this.Cases));
             for clus = 1:length(this.Cases)
                 if ~isempty(this.Cases{clus})
-                    % First case in cluster should be best match due to
-                    % indexing (sorting) above?
-                    similarity(clus) = sqrt(sum(( weights(clus,:,2) .* newcase.OriginalAUs ).^2) ...
-                        + sum(( weights(clus,:,1) .* ~newcase.OriginalAUs ).^2));
+                    newcase.Emotion = clus;
+                    similarity(clus) = similarFunc(newcase, newcase, weights);
                     
                     empty = false;
                 end    
@@ -78,7 +76,7 @@ classdef CBR_cluster
             % case from each cluster, now only take the top few (k-nearest
             % neighbour)
             
-            minRange = max(similarity) - (max(similarity) - min(similarity)) / 2;
+            minRange = max(similarity) - (max(similarity) - min(similarity)) / 5;
             
             [ordered_similarity, clusters] = sort(similarity, 'descend');
             bestClusters = clusters(ordered_similarity >= minRange);
@@ -104,7 +102,6 @@ classdef CBR_cluster
                         end
                     elseif similarity == bestSimilarity ...
                             && CASE.Typicality > bestCase.Typicality
-                        disp('hello ello ello');
                         bestCase = CASE;
                     end
                 end
