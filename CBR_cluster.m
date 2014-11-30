@@ -1,6 +1,6 @@
 classdef CBR_cluster
     properties
-        Cases
+        Clusters
         Weights
         Seen
     end
@@ -8,7 +8,7 @@ classdef CBR_cluster
     methods
         function this = CBR_cluster()
             this.Weights = zeros(6, 45, 2);  % 3rd dim: weigths -ve and +ve                   
-            this.Cases = {[],[],[],[],[],[]};          
+            this.Clusters = {[],[],[],[],[],[]};          
             this.Seen = {};
             for i = 1:6
                 this.Seen{i} = containers.Map('KeyType','double', 'ValueType','any'); 
@@ -42,7 +42,7 @@ classdef CBR_cluster
             this.Weights(newcase.Emotion, AUneg, 1) = ...
                 this.Weights(newcase.Emotion, AUneg, 1) + 1; % adds +1 to all (row=emotion, col=-ve AU for sample) of weights (:,:,2)
 
-            this.Cases{newcase.Emotion} = [this.Cases{newcase.Emotion}, newcase];
+            this.Clusters{newcase.Emotion} = [this.Clusters{newcase.Emotion}, newcase];
             this.Seen{newcase.Emotion}(key) = [this.Seen{newcase.Emotion}(key), newcase];
         end    
           
@@ -50,16 +50,16 @@ classdef CBR_cluster
             weights = this.Weights;
                     
             % normalises weights
-            for clus = 1:length(this.Cases)
-                if ~isempty(this.Cases{clus})
-                    weights(clus,:,:) = weights(clus,:,:) / length(this.Cases{clus});
+            for clus = 1:length(this.Clusters)
+                if ~isempty(this.Clusters{clus})
+                    weights(clus,:,:) = weights(clus,:,:) / length(this.Clusters{clus});
                 end    
             end  
             
             empty = true;
-            similarity = zeros(1, length(this.Cases));
-            for clus = 1:length(this.Cases)
-                if ~isempty(this.Cases{clus})
+            similarity = zeros(1, length(this.Clusters));
+            for clus = 1:length(this.Clusters)
+                if ~isempty(this.Clusters{clus})
                     newcase.Emotion = clus;
                     similarity(clus) = similarFunc(newcase, newcase, weights);
                     
@@ -89,7 +89,7 @@ classdef CBR_cluster
             % Loop through all cases in each of our chosen clusters and
             % find the REAL best case (one with highest similarity)
             for CLUSTER = bestClusters 
-                for CASE = this.Cases{CLUSTER}
+                for CASE = this.Clusters{CLUSTER}
                     similarity = similarFunc(CASE, newcase, weights);
                     if similarity > bestSimilarity
                         bestSimilarity = similarity;
