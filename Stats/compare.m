@@ -71,6 +71,7 @@ cbrClassifications = classificationsMatrix(cbrIndex:3:end, :);
 
 % Test for any significant differences between the algorithms.
 results = zeros(3, 6);
+classificationMeans = zeros(3, 6);
 treeNetIndex = 1;
 treeCbrIndex = 2;
 netCbrIndex = 3;
@@ -80,8 +81,15 @@ for emotion=1:6,
     results(treeNetIndex, emotion) = testFcn(treeClassifications(:, emotion), netClassifications(:, emotion), 'Alpha', alpha);
     results(treeCbrIndex, emotion) = testFcn(treeClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
     results(netCbrIndex, emotion) = testFcn(netClassifications(:, emotion), cbrClassifications(:, emotion), 'Alpha', alpha);
+    
+    classificationMeans(treeIndex, emotion) = mean(treeClassifications(:, emotion));
+    classificationMeans(netIndex, emotion) = mean(netClassifications(:, emotion));
+    classificationMeans(cbrIndex, emotion) = mean(cbrClassifications(:, emotion));
 end
 
 fprintf('Significance level = %f.\n', alpha);
 %printmat(results, 'Results', 'Tree-Net Tree-CBR Net-CBR', 'Anger Disgust Fear Happiness Sadness Surprise');
 disp(results);
+
+fprintf('Classification means:\n');
+disp(classificationMeans);

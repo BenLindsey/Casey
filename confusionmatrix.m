@@ -55,11 +55,12 @@ classdef confusionmatrix < handle
         end
         
         function classification = getClassificationFor(this, class)
-            trueValues = this.Matrix;
-            trueValues(class, :) = [];
-            trueValues(:, class) = [];
+            trueNegatives = this.Matrix;
+            trueNegatives(class, :) = [];
+            trueNegatives(:, class) = [];
             
-            classification = sum(trueValues(:)) / sum(this.Matrix(:));
+            classification = (this.Matrix(class, class) + sum(trueNegatives(:))) ...
+                / sum(this.Matrix(:));
         end
 
         % Return the recall rate of the given class.
