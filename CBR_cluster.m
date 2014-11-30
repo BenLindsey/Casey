@@ -2,21 +2,30 @@ classdef CBR_cluster
     properties
         Cases
         Weights
+        Seen
     end
     
     methods
         function this = CBR_cluster()
             this.Weights = zeros(6, 45, 2);  % 3rd dim: weigths -ve and +ve                   
-            this.Cases = {[],[],[],[],[],[]};             
+            this.Cases = {[],[],[],[],[],[]};          
+            this.Seen = {};
+            for i = 1:6
+                this.Seen{i} = containers.Map('KeyType','double', 'ValueType','any'); 
+            end
         end
         
         function this = retainCase(this, newcase) 
-            for il = 1:length(this.Cases{newcase.Emotion}) % steps through all cases classified as emotion of sample
+            key = sum(newcase.AUs);
+            
+            if(~this.Seen{newcase.Emotion}.isKey(key))
+                this.Seen{newcase.Emotion}(key) = {};
+            end
+            
+            for CASE = this.Seen{newcase.Emotion}(key) % steps through all cases classified as emotion of sample
                 %  if sample case (<-end) have same AUs as case(il) (for emotion)  
-                if (isequal(newcase.AUs, this.Cases{newcase.Emotion}(il).AUs))
-                    this.Cases{newcase.Emotion}(il).Typicality = ...
-                        this.Cases{newcase.Emotion}(il).Typicality + 1;   % increases sums typic. of cases -> into first case
-
+                if (isequal(newcase.AUs, CASE.AUs))
+                    CASE.Typicality = CASE.Typicality + 1;   % increases sums typic. of cases -> into first case
                     return;
                 end        
             end
@@ -32,9 +41,9 @@ classdef CBR_cluster
 
             this.Weights(newcase.Emotion, AUneg, 1) = ...
                 this.Weights(newcase.Emotion, AUneg, 1) + 1; % adds +1 to all (row=emotion, col=-ve AU for sample) of weights (:,:,2)
-   
-            % appends case to {emotion} cell in cluster
+
             this.Cases{newcase.Emotion} = [this.Cases{newcase.Emotion}, newcase];
+            this.Seen{newcase.Emotion}(key) = [this.Seen{newcase.Emotion}(key), newcase];
         end    
           
         function bestCase = retrieveCase(this, newcase, similarFunc)
@@ -71,9 +80,9 @@ classdef CBR_cluster
             
             minRange = max(similarity) - (max(similarity) - min(similarity)) / 2;
             
-            % ranV holds the index of clusters with the top similarities
-            % (based on importance)
-            bestClusters = find (similarity >= minRange);
+            [ordered_similarity, clusters] = sort(similarity, 'descend');
+            bestClusters = clusters(ordered_similarity >= minRange);
+            
             lastCluster = bestClusters(end);
             
             bestSimilarity = 0;
@@ -82,9 +91,8 @@ classdef CBR_cluster
             % Loop through all cases in each of our chosen clusters and
             % find the REAL best case (one with highest similarity)
             for CLUSTER = bestClusters 
-                for CASE = this.Cases{CLUSTER} 
+                for CASE = this.Cases{CLUSTER}
                     similarity = similarFunc(CASE, newcase, weights);
-                    
                     if similarity > bestSimilarity
                         bestSimilarity = similarity;
                         bestCase = CASE;
@@ -96,6 +104,7 @@ classdef CBR_cluster
                         end
                     elseif similarity == bestSimilarity ...
                             && CASE.Typicality > bestCase.Typicality
+                        disp('hello ello ello');
                         bestCase = CASE;
                     end
                 end
